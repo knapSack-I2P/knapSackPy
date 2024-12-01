@@ -20,17 +20,3 @@ def partition(full_video, res='1280x760', *args):
         'hls', str(Path(converted_path, 'part.m3u8'))
     ], logger=None)
     return converted_path
-
-
-full_video = "assets/full.mp4"
-
-# import vlc
-# import time
-
-'''medialist = vlc.MediaList([vlc.Media(media) for media in ['vids/meme/meme.m3u8']])
-player = vlc.MediaListPlayer()
-player.set_media_list(medialist)
-player.next()
-player.play()
-
-time.sleep(current_duration)'''
