@@ -11,10 +11,22 @@ class Knap:
         self.idx, self.hash = state
 
 
+class NullKnap(Knap):
+    def __init__(self, ts_lengths):
+        super().__init__()
+        self.lookup: list[int] = ts_lengths if ts_lengths else []
+
+
 class KnapVideo:
-    def __init__(self):
+    def __init__(self, length):
         self.hash = id(self)
-        self.knaps: list[Knap] = [Knap()] * 10
+        self.knaps: list[Knap | None] = [None] * length
+
+    def __get__(self, index):
+        return self.knaps[index]
+
+    def __set__(self, index, knap):
+        self.knaps[index] = knap
 
     def serialize(self):
         return {
@@ -33,7 +45,7 @@ class KnapVideo:
 class KnapChannel:
     def __init__(self):
         self.hash = id(self)
-        self.videos: list[KnapVideo] = [KnapVideo()] * 2
+        self.videos: list[KnapVideo] = []
 
     def serialize(self):
         return {
@@ -51,7 +63,7 @@ class KnapChannel:
 
 class KnapSack:
     def __init__(self):
-        self.channels: list[KnapChannel] = [KnapChannel()] * 2
+        self.channels: list[KnapChannel] = []
 
     def serialize(self):
         return {
