@@ -17,10 +17,16 @@ class KnapVideo:
         self.knaps: list[Knap] = [Knap()] * 10
 
     def serialize(self):
-        return {str(knap.hash): knap.serialize() for knap in self.knaps}
+        return {
+            str(knap.hash): knap.serialize()
+            for knap in self.knaps
+        }
 
     def deserialize(self, state):
-        self.knaps = [Knap().deserialize(knap) for knap in state.values()]
+        self.knaps = [
+            Knap().deserialize(knap)
+            for knap in state.values()
+        ]
         return self
 
 
@@ -30,11 +36,16 @@ class KnapChannel:
         self.videos: list[KnapVideo] = [KnapVideo()] * 2
 
     def serialize(self):
-        return {str(video.hash): video.serialize() for video in self.videos}
+        return {
+            str(video.hash): video.serialize()
+            for video in self.videos
+        }
 
     def deserialize(self, state):
-        self.videos = [KnapVideo().deserialize(video)
-                       for video in state.values()]
+        self.videos = [
+            KnapVideo().deserialize(video)
+            for video in state.values()
+        ]
         return self
 
 
@@ -43,10 +54,14 @@ class KnapSack:
         self.channels: list[KnapChannel] = [KnapChannel()] * 2
 
     def serialize(self):
-        return {str(channel.hash): channel.serialize()
-                for channel in self.channels}
+        return {
+            str(channel.hash): channel.serialize()
+            for channel in self.channels
+        }
 
     def deserialize(self, state):
-        self.channels = [KnapChannel().deserialize(channel)
-                         for channel in state.values()]
+        self.channels = [
+            KnapChannel().deserialize(channel)
+            for channel in state.values()
+        ]
         return self
