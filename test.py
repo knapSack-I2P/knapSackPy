@@ -1,22 +1,31 @@
 import moviepy.tools
-from moviepy import VideoFileClip
+from config import FILE_DIRECTORY
+from pathlib import Path
+import datetime
+
+
+def partition(full_video, res='1280x760', *args):
+    videoname = Path(full_video).stem
+    converted_path = Path(
+        FILE_DIRECTORY,
+        str(videoname) + str(datetime.datetime.now())
+    )
+    converted_path.mkdir()
+
+    FFMPEG = moviepy.ffmpeg_tools.FFMPEG_BINARY
+    moviepy.ffmpeg_tools.subprocess_call([
+        FFMPEG,
+        '-i', full_video, '-s', res,
+        '-start_number', '0', '-hls_wrap', '0.2', '-f',
+        'hls', str(Path(converted_path, 'part.m3u8'))
+    ], logger=None)
+    return converted_path
+
 
 full_video = "assets/full.mp4"
-current_duration = VideoFileClip(full_video).duration
-single_duration = 1
-vlist = []
-print(full_video, current_duration, single_duration, sep=' | ')
 
-FFMPEG = moviepy.ffmpeg_tools.FFMPEG_BINARY
-moviepy.ffmpeg_tools.subprocess_call([
-    FFMPEG,
-    '-i', 'assets/full.mp4', '-s', '1280x760',
-    '-start_number', '0', '-hls_wrap', '0.2', '-f',
-    'hls', 'vids/meme/meme.m3u8'
-], logger=None)
-
-import vlc
-import time
+# import vlc
+# import time
 
 '''medialist = vlc.MediaList([vlc.Media(media) for media in ['vids/meme/meme.m3u8']])
 player = vlc.MediaListPlayer()
