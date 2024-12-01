@@ -1,3 +1,7 @@
+import rich.repr
+
+
+@rich.repr.auto
 class Knap:
     def __init__(self):
         self.idx = 0
@@ -11,12 +15,14 @@ class Knap:
         self.idx, self.hash = state
 
 
+@rich.repr.auto
 class NullKnap(Knap):
     def __init__(self, ts_lengths):
         super().__init__()
         self.lookup: list[int] = ts_lengths if ts_lengths else []
 
 
+@rich.repr.auto
 class KnapVideo:
     def __init__(self, length):
         self.hash = id(self)
@@ -42,6 +48,7 @@ class KnapVideo:
         return self
 
 
+@rich.repr.auto
 class KnapChannel:
     def __init__(self):
         self.hash = id(self)
@@ -61,6 +68,7 @@ class KnapChannel:
         return self
 
 
+@rich.repr.auto
 class KnapSack:
     def __init__(self):
         self.channels: list[KnapChannel] = []

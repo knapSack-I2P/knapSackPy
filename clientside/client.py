@@ -1,13 +1,11 @@
-import asyncio
 import json
-from typing import Callable
 from misc import client_print as print
 
 import aiohttp
 
 from abstractions.knapclasses import KnapSack
 from config import DEST
-
+import rich.repr
 
 async def clientside():
     async with aiohttp.ClientSession(

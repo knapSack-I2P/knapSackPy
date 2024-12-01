@@ -1,5 +1,4 @@
 import json
-from typing import Callable
 from aiohttp import web
 from aiohttp_socks import ProxyConnector
 
