@@ -10,7 +10,6 @@ from config import DEST
 
 
 async def clientside():
-    await asyncio.sleep(6)
     async with aiohttp.ClientSession(
             timeout=aiohttp.ClientTimeout(50),
             proxy="http://localhost:4444"
