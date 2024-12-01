@@ -39,6 +39,7 @@ def serverside():
 
 
 async def clientside():
+    await asyncio.sleep(6)
     async with aiohttp.ClientSession(
             timeout=aiohttp.ClientTimeout(50),
             proxy="http://localhost:4444"
@@ -50,15 +51,12 @@ async def clientside():
 
 
 def main():
-    while True:
-        match input('s/c >> '):
-            case 's':
-                web.run_app(serverside(), port=6626)
-            case 'c':
-                asyncio.run(clientside())
-            case _:
-                continue
-        break
+    loop = asyncio.new_event_loop()
+    loop.create_task(web._run_app(serverside(), port = 6626))
+    loop.create_task(clientside())
+    loop.run_forever()
+
+
 
 
 if __name__ == "__main__":
