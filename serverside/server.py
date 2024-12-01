@@ -1,9 +1,14 @@
 import json
+
 from aiohttp import web
 from aiohttp_socks import ProxyConnector
 
-from shared.knapsack import knapsack
 from misc import server_print as print
+from shared.knapsack import knapsack
+
+
+def i2p_only(f):
+    ...
 
 def serverside():
     async def handle_default(request):
@@ -17,7 +22,7 @@ def serverside():
     async def handle_m3u8(request):
         print(request)
         print(knapsack.serialize())
-        return web.FileResponse("vids/meme/meme0.ts", 1024*40)
+        return web.FileResponse("vids/meme/meme0.ts", 1024 * 40)
 
     app = web.Application()
     app.router.add_get('/', handle_default)

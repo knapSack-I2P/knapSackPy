@@ -1,7 +1,9 @@
-import moviepy.tools
-from config import FILE_DIRECTORY
-from pathlib import Path
 import datetime
+from pathlib import Path
+
+import moviepy.tools
+
+from config import FILE_DIRECTORY
 
 
 def partition(full_video, res='1280x760', *args):
