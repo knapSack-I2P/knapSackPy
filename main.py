@@ -2,8 +2,8 @@ import asyncio
 
 from aiohttp import web
 
-from clientside.client import clientside
-from config import FILE_DIRECTORY
+from clientside.client import Client
+from config import FILE_DIRECTORY, DEST
 from misc import server_print
 from partition import partition
 from serverside.server import serverside
@@ -37,9 +37,10 @@ def prep():
 
 def main():
     prep()
+    client = Client()
     loop = asyncio.new_event_loop()
     loop.create_task(web._run_app(serverside(), port=6626, print=server_print))
-    loop.create_task(clientside())
+    loop.create_task(client.run(DEST))
     loop.create_task(cmd_handler())
     loop.run_forever()
 

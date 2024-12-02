@@ -10,6 +10,7 @@ from shared.knapsack import knapsack
 def i2p_only(f):
     ...
 
+
 def serverside():
     async def handle_default(request):
         return web.HTTPFound(location='/ping')
@@ -29,6 +30,7 @@ def serverside():
     app.router.add_get('/ping', handle_ping)
     app.router.add_get('/m3u8', handle_m3u8)
 
-    connector = ProxyConnector.from_url('socks5://localhost:4444')  # SOCKS5 прокси I2P
+    connector = ProxyConnector.from_url(
+        'socks5://localhost:4444')  # SOCKS5 прокси I2P
     app['connector'] = connector
     return app
