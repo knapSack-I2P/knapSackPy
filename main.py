@@ -4,7 +4,7 @@ from aiohttp import web
 
 from clientside.client import Client
 from config import FILE_DIRECTORY, DEST
-from partition import partition
+from serverside.partition import partition
 from serverside.server import serverside
 from shared.prettyIO import update, server_print, console
 
@@ -32,6 +32,7 @@ async def cmd_handler():
 
 def prep():
     FILE_DIRECTORY.mkdir(exist_ok=True)
+    (FILE_DIRECTORY / 'sack').mkdir(exist_ok=True)
 
 
 def main():
