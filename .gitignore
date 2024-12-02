@@ -2,3 +2,4 @@
 /.venv/
 __pycache__
 /i2pd_2.54.0_win64_mingw/
+/config.py/

@@ -1,27 +1,45 @@
+import functools
 import json
 
 from aiohttp import web
 from aiohttp_socks import ProxyConnector
+from rich.pretty import pprint
 
 from misc import server_print as print
 from shared.knapsack import knapsack
+from shared.prettyIO import console
 
 
-def i2p_only(f):
-    ...
+def block_clearnet(method):
+    async def block(request):
+        return web.HTTPProxyAuthenticationRequired()
+
+    @functools.wraps(method)
+    async def wrapper(request):
+        if request.remote == '127.0.0.1':
+            return await method(request)
+        else:
+            print(
+                '[bold italic red]WARNING![/bold italic red]'
+                ' - An attempt to connect from clearnet was registered.'
+            )
+            return await block(request)
+
+    return wrapper
+
 
 def serverside():
+    @block_clearnet
     async def handle_default(request):
+        pprint(request, console=console, expand_all=True)
         return web.HTTPFound(location='/ping')
 
+    @block_clearnet
     async def handle_ping(request):
-        print(request)
-        print(knapsack.serialize())
         return web.Response(body=json.dumps(knapsack.serialize()), content_type='')
 
+    @block_clearnet
     async def handle_m3u8(request):
-        print(request)
-        print(knapsack.serialize())
         return web.FileResponse("vids/meme/meme0.ts", 1024 * 40)
 
     app = web.Application()
