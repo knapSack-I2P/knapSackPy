@@ -4,10 +4,9 @@ from aiohttp import web
 
 from clientside.client import Client
 from config import FILE_DIRECTORY, DEST
-from misc import server_print
 from partition import partition
 from serverside.server import serverside
-from shared.prettyIO import console
+from shared.prettyIO import update, server_print, console
 
 
 async def cmd_handler():
