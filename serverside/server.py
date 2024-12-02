@@ -19,10 +19,11 @@ def block_clearnet(method):
 
     @functools.wraps(method)
     async def wrapper(request):
-        if request.remote == '127.0.0.1':
+        if str(request.remote)[0:3] == '127':
             return await method(request)
         else:
             print(SERVER_CLEARNET_WARN)
+            print(request.remote)
             return await block(request)
 
     return wrapper
