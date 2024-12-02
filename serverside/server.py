@@ -28,7 +28,6 @@ def block_clearnet(method):
     return wrapper
 
 
-
 def serverside():
     @block_clearnet
     async def handle_default(request):

@@ -1,12 +1,11 @@
-import rich.repr
+from hashlib import sha256
 
 
-@rich.repr.auto
 class Knap:
-    def __init__(self):
-        self.idx = 0
-        self.hash = id(self)
-        self.data = b''
+    def __init__(self, data, idx=1, hash=sha256()):
+        self.idx = idx
+        self.hash = hash.hexdigest()
+        self.data = data
 
     def serialize(self):
         return [self.idx, self.hash]
@@ -15,40 +14,39 @@ class Knap:
         self.idx, self.hash = state
 
 
-@rich.repr.auto
 class NullKnap(Knap):
-    def __init__(self, ts_lengths):
-        super().__init__()
+    def __init__(self, data, ts_lengths, hash=sha256()):
+        super().__init__(data, 0, hash)
         self.lookup: list[int] = ts_lengths if ts_lengths else []
 
 
-@rich.repr.auto
 class KnapVideo:
-    def __init__(self, length):
-        self.hash = id(self)
+    def __init__(self, length, hash=sha256()):
+        self.hash = hash.hexdigest()
         self.knaps: list[Knap | None] = [None] * length
 
-    def __get__(self, index):
+    def __getitem__(self, index):
         return self.knaps[index]
 
-    def __set__(self, index, knap):
+    def __setitem__(self, index, knap):
         self.knaps[index] = knap
 
     def serialize(self):
-        return {
-            str(knap.hash): knap.serialize()
+        return [
+            knap.serialize()
+            if knap else None
             for knap in self.knaps
-        }
+        ]
 
     def deserialize(self, state):
         self.knaps = [
             Knap().deserialize(knap)
+            if knap else None
             for knap in state.values()
         ]
         return self
 
 
-@rich.repr.auto
 class KnapChannel:
     def __init__(self):
         self.hash = id(self)
@@ -68,7 +66,6 @@ class KnapChannel:
         return self
 
 
-@rich.repr.auto
 class KnapSack:
     def __init__(self):
         self.channels: list[KnapChannel] = []
