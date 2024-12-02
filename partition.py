@@ -5,18 +5,21 @@ import moviepy.tools
 
 from abstractions.knapclasses import *
 from config import FILE_DIRECTORY
-from shared.prettyIO import console
-from rich.progress import track, Progress
+from rich.progress import track
 
 
+# Function that makes list of knaps from the original video
 def partition(full_video, res='1280x760', *args):
-    videoname = Path(full_video).stem
+    videoname = Path(full_video).stem  # Original video name
     converted_path = Path(
         FILE_DIRECTORY,
         str(videoname) + datetime.datetime.now().strftime("%Y_%m_%d %H-%M-%S")
-    )
+    )  # Path to a directory which contains Knaps
 
+    # Creating a directory for Knaps
     converted_path.mkdir()
+
+    # Making temporary .m3u8 and .ts files from original video
     FFMPEG = moviepy.ffmpeg_tools.FFMPEG_BINARY
     moviepy.ffmpeg_tools.subprocess_call([
         FFMPEG,
@@ -29,24 +32,34 @@ def partition(full_video, res='1280x760', *args):
     video_hash = sha256()
     idx = 1
 
+    # Making Knaps from .ts files
     for ts in track(converted_path.iterdir(), description='Knapping...'):
         if ts.suffix != '.ts' or not ts.stem:
             continue
         ts_idx = int(ts.stem[-1])
         ts_knaps[ts_idx] = []
         with open(ts, 'rb') as _ts:
-            byte = _ts.read(25 * 1024)
+            byte = _ts.read(25 * 1024)  # reading first knap
             while byte:
                 (FILE_DIRECTORY / 'sack').mkdir(exist_ok=True)
+                # making knap's hash
                 hash = sha256(byte)
+
+                # making a file which contains knap's data
                 with open(FILE_DIRECTORY / 'sack' / (hash.hexdigest() + '.knap'), 'wb') as knap_file:
                     knap_file.write(byte)
-                knap = Knap(FILE_DIRECTORY / 'sack' / (hash.hexdigest() + '.knap'), idx, hash)
+
+                # making knap representation
+                knap = Knap(FILE_DIRECTORY / 'sack' /
+                            (hash.hexdigest() + '.knap'), idx, hash)
                 ts_knaps[ts_idx].append(knap)
+
+                # reading next knap
                 idx += 1
                 byte = _ts.read(25 * 1024)
-        ts.unlink()
+        ts.unlink()  # deleting temporary file
 
+    # Making NullKnap from the .m3u8 file
     m3u8 = converted_path / 'part.m3u8'
     with open(m3u8, 'rb') as _m3u8:
         byte = _m3u8.read()
@@ -58,6 +71,7 @@ def partition(full_video, res='1280x760', *args):
     m3u8.unlink()
     ts_knaps[0] = [null_knap]
 
+    # Making KnapVideo
     cnt = 0
     for i in track(range(len(ts_knaps)), description='Hashing...'):
         for knap in ts_knaps[i]:
@@ -65,7 +79,7 @@ def partition(full_video, res='1280x760', *args):
             cnt += 1
 
     knap_video = KnapVideo(cnt, video_hash)
+    # Adding Knaps to KnapVideo
     for i in track(range(len(ts_knaps)), description='Creating knapVideo...'):
         for idx, knap in enumerate(ts_knaps[i]):
             knap_video[i + idx] = knap
-

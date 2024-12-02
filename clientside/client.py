@@ -6,6 +6,7 @@ from abstractions.knapclasses import KnapSack
 from shared.prettyIO import client_print as print
 
 
+# Session which send requests to other users or server
 class Client:
     def __init__(self):
         ...

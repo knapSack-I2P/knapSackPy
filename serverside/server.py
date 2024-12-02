@@ -11,6 +11,8 @@ from shared.knapsack import knapsack
 from shared.prettyIO import console
 
 
+# Decorator to check if the ip address of requisting client
+# was sent from 127.0.0.1 which means it came from i2p proxy server
 def block_clearnet(method):
     async def block(request):
         return web.HTTPProxyAuthenticationRequired()
