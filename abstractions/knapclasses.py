@@ -2,10 +2,11 @@ from hashlib import sha256
 
 
 class Knap:
-    def __init__(self, data, idx=1, hash=sha256()):
+    def __init__(self, path, idx=1, hash=sha256()):
         self.idx = idx
-        self.hash = hash.hexdigest()
-        self.data = data
+        self.hash = hash
+        self.hash16 = hash.hexdigest()
+        self.path = path
 
     def serialize(self):
         return [self.idx, self.hash]

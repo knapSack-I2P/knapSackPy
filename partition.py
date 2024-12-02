@@ -1,22 +1,18 @@
 import datetime
 from pathlib import Path
-from shared.prettyIO import console
 
-import moviepy.tools
-
-from hashlib import sha256
-from config import FILE_DIRECTORY
 from abstractions.knapclasses import *
+from config import FILE_DIRECTORY
 
 
 def partition(full_video, res='1280x760', *args):
     videoname = Path(full_video).stem
     converted_path = Path(
         FILE_DIRECTORY,
-        str(videoname) + str(datetime.datetime.now())
+        str(videoname) + datetime.datetime.now().strftime("%Y_%m_%d %H-%M-%S")
     )
-    converted_path.mkdir()
 
+    converted_path.mkdir()
     FFMPEG = moviepy.ffmpeg_tools.FFMPEG_BINARY
     moviepy.ffmpeg_tools.subprocess_call([
         FFMPEG,
@@ -25,7 +21,7 @@ def partition(full_video, res='1280x760', *args):
         'hls', str(Path(converted_path, 'part.m3u8'))
     ], logger=None)
 
-    ts_knaps = {}
+    ts_knaps: dict[int, list[Knap]] = {}
     video_hash = sha256()
     idx = 1
 
@@ -37,10 +33,15 @@ def partition(full_video, res='1280x760', *args):
         with open(ts, 'rb') as _ts:
             byte = _ts.read(25 * 1024)
             while byte:
-                knap = Knap(byte, idx, sha256(byte))
+                (FILE_DIRECTORY / 'sack').mkdir(exist_ok=True)
+                hash = sha256(byte)
+                with open(FILE_DIRECTORY / 'sack' / (hash.hexdigest() + '.knap'), 'wb') as knap_file:
+                    knap_file.write(byte)
+                knap = Knap(FILE_DIRECTORY / 'sack' / (hash.hexdigest() + '.knap'), idx, hash)
                 ts_knaps[ts_idx].append(knap)
                 idx += 1
                 byte = _ts.read(25 * 1024)
+                del byte
         ts.unlink()
 
     m3u8 = converted_path / 'part.m3u8'
@@ -57,10 +58,11 @@ def partition(full_video, res='1280x760', *args):
     cnt = 0
     for i in range(len(ts_knaps)):
         for knap in ts_knaps[i]:
-            video_hash.update(knap.data)
+            video_hash.update(knap.hash16.encode('utf-8'))
             cnt += 1
 
     knap_video = KnapVideo(cnt, video_hash)
     for i in range(len(ts_knaps)):
         for idx, knap in enumerate(ts_knaps[i]):
             knap_video[i + idx] = knap
+

@@ -1,16 +1,13 @@
-from rich import print
-from rich.console import Console
+
+server_tag = '[bold frame]kSk_SERVER[/bold frame] '
 
 
-def _initialize():
-    global _rich_console
-    _rich_console = Console()
+def server_print(*args, **kwargs):
+    print(server_tag, *[str(arg).replace('\n', '\n' + server_tag) for arg in args])
 
 
-try:
-    console = _rich_console
-    print = print
-except NameError:
-    _initialize()
-    console = _rich_console
-    print = print
+client_tag = '[bold frame]kSk_CLIENT[/bold frame] '
+
+
+def client_print(*args, **kwargs):
+    print(client_tag, *[str(arg).replace('\n', '\n' + client_tag) for arg in args])

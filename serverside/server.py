@@ -3,11 +3,10 @@ import json
 
 from aiohttp import web
 from aiohttp_socks import ProxyConnector
-from rich.pretty import pprint
 
-from misc import server_print as print
+from constants import *
+from shared.prettyIO import server_print as print
 from shared.knapsack import knapsack
-from shared.prettyIO import console
 
 
 def block_clearnet(method):
@@ -19,10 +18,7 @@ def block_clearnet(method):
         if request.remote == '127.0.0.1':
             return await method(request)
         else:
-            print(
-                '[bold italic red]WARNING![/bold italic red]'
-                ' - An attempt to connect from clearnet was registered.'
-            )
+            print(SERVER_CLEARNET_WARN)
             return await block(request)
 
     return wrapper
@@ -31,7 +27,7 @@ def block_clearnet(method):
 def serverside():
     @block_clearnet
     async def handle_default(request):
-        pprint(request, console=console, expand_all=True)
+        print(request, expand_all=True)
         return web.HTTPFound(location='/ping')
 
     @block_clearnet

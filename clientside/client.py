@@ -3,7 +3,7 @@ import json
 import aiohttp
 
 from abstractions.knapclasses import KnapSack
-from misc import client_print as print
+from shared.prettyIO import client_print as print
 
 
 class Client:
