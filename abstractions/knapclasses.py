@@ -1,4 +1,6 @@
 from hashlib import sha256
+from pathlib import Path
+from config import FILE_DIRECTORY
 
 
 # Knap is atomic video unit that is 25(or sometimes less) Kilobytes length
@@ -23,6 +25,7 @@ class NullKnap(Knap):
     def __init__(self, data, ts_lengths, hash=sha256()):
         super().__init__(data, 0, hash)
         self.lookup: list[int] = ts_lengths if ts_lengths else []
+        self.knaps_hashes = []
 
 
 # KnapVideo is an objects that consists of Knaps and the NullKnap that
@@ -53,6 +56,29 @@ class KnapVideo:
         ]
         return self
 
+    async def assembly_ts(self, knaps, idx):
+        ts_path = Path.cwd() / 'tmp' / self.hash / f'part{idx}.ts'
+        knaps = await knaps
+        async with open(ts_path, 'wb') as ts:
+            async for knap in knaps:
+                async with open(knap.path, 'rb') as byte:
+                    ts.write(byte.read())
+
+    def assembly(self):
+        async def collect_knaps(idx, ts_layout):
+            cursor = sum(layout[:idx]) + 1
+            to_assembly = []
+            async for i in range(cursor, cursor + ts_layout):
+                knap_path = Path(FILE_DIRECTORY / 'sack' /
+                                 (self.knaps[0].knaps_hashes[i] + '.knap'))
+                if not self.knaps[i] and knap_path.exists():
+                    self.knaps[i] = Knap(
+                        knap_path, i, self.knaps[0].knaps_hashes[i])
+
+        layout = self.knaps[0].layout
+        for idx, ts_layout in enumerate(layout):
+            self.assembly_ts(collect_knaps(idx, ts_layout), idx)
+
 
 # KnapChannel is an object that represents the author of KnapVideos
 class KnapChannel:
@@ -79,6 +105,7 @@ class KnapChannel:
 class KnapSack:
     def __init__(self):
         self.channels: list[KnapChannel] = []
+        self.b32 = ''
 
     def serialize(self):
         return {

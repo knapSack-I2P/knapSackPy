@@ -83,3 +83,4 @@ def partition(full_video, res='1280x760', *args):
     for i in track(range(len(ts_knaps)), description='Creating knapVideo...'):
         for idx, knap in enumerate(ts_knaps[i]):
             knap_video[i + idx] = knap
+            ts_knaps[0].knaps_hashes.append(knap.hash)
