@@ -6,13 +6,13 @@ from clientside.client import Client
 from config import FILE_DIRECTORY, DEST
 from partition import partition
 from serverside.server import serverside
-from shared.prettyIO import update, server_print, console
+from shared.prettyIO import server_print
 
 
 async def cmd_handler():
     loop = asyncio.get_running_loop()
     while loop.is_running():
-        cmd = (await loop.run_in_executor(executor=None, func=console.input)).split()
+        cmd = (await loop.run_in_executor(executor=None, func=input)).split()
         match cmd:
             case ['seed']:  # TODO: Add help call
                 ...

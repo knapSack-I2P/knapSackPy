@@ -3,12 +3,10 @@ import json
 
 from aiohttp import web
 from aiohttp_socks import ProxyConnector
-from rich.pretty import pprint
 
 from constants import *
 from shared.prettyIO import server_print as print
 from shared.knapsack import knapsack
-from shared.prettyIO import console
 
 
 def block_clearnet(method):
@@ -29,7 +27,7 @@ def block_clearnet(method):
 def serverside():
     @block_clearnet
     async def handle_default(request):
-        pprint(request, console=console, expand_all=True)
+        print(request, expand_all=True)
         return web.HTTPFound(location='/ping')
 
     @block_clearnet
