@@ -1,6 +1,8 @@
 import datetime
 from pathlib import Path
 
+from pyffmpeg import FFmpeg
+
 from abstractions.knapclasses import *
 from config import FILE_DIRECTORY
 
@@ -13,13 +15,13 @@ def partition(full_video, res='1280x760', *args):
     )
 
     converted_path.mkdir()
-    FFMPEG = moviepy.ffmpeg_tools.FFMPEG_BINARY
-    moviepy.ffmpeg_tools.subprocess_call([
-        FFMPEG,
-        '-i', full_video, '-s', res,
-        '-start_number', '1', '-hls_wrap', '0.2', '-f',
-        'hls', str(Path(converted_path, 'part.m3u8'))
-    ], logger=None)
+
+    ff = FFmpeg()
+    ff.options(f"-i {full_video} "
+               f"-s {res} "
+               f"-start_number 1 "
+               f"-hls_wrap 0.2 "
+               f"-f {str(Path(converted_path, 'part.m3u8'))}")
 
     ts_knaps: dict[int, list[Knap]] = {}
     video_hash = sha256()
